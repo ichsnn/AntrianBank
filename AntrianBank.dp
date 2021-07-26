@@ -1,0 +1,15 @@
+[Project]
+FileName=D:\StrukturData\AntrianBank\AntrianBank.dp
+Name=AntrianBank
+MainUnit=D:\StrukturData\AntrianBank\AntrianBankApp.pas
+UnitCount=1
+ResFiles=D:\StrukturData\AntrianBank\rsrc.rc
+NoConsole=0
+IsDll=0
+Icon=D:\StrukturData\AntrianBank\assets\icon\icon.ico
+CompilerOptions=
+IncludeDirs=
+ObjFile=
+[Unit1]
+FileName=D:\StrukturData\AntrianBank\AntrianBankApp.pas
+FileTime=1392142669
