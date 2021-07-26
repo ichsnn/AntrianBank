@@ -267,14 +267,14 @@ begin
 end;
 
 // menu, antrian, nomor antrian terakhir, nomor antrian di meja 1 dan 2
-procedure pilihanMenu(menu : integer; var qH : Antrian; var cur : integer; var m1 : nomorAntrian; var m2 : nomorAntrian);
+procedure pilihanMenu(menu : char; var qH : Antrian; var cur : integer; var m1 : nomorAntrian; var m2 : nomorAntrian);
 begin
   case (menu) of
-    1 : menu1(qH, cur);
-    2 : menu2(qH, cur);
-    3 : menu3(qH, m1);
-    4 : menu4(qH, m2);
-    5 : menu5();
+    '1' : menu1(qH, cur);
+    '2' : menu2(qH, cur);
+    '3' : menu3(qH, m1);
+    '4' : menu4(qH, m2);
+    '5' : menu5();
   else
     writeln;
     gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Masukkan Salah!] Tekan tombol sembarang...   ');
@@ -283,10 +283,11 @@ begin
   end;
 end;
 
+// Deklarasi Variabel Yang Akan Digunakan
 var
   q : Antrian;  // antrian bank
   last : integer; // nomor antrian angka terakhir
-  menu : integer; // pilihan menu
+  menu : char; // pilihan menu
   meja1, meja2 : nomorAntrian; // penampung nomor antrian yang dipanggi
 
 // PROGRAM UTAMA
@@ -297,6 +298,7 @@ begin
   last := 0; // inisialisasi nomor urutan angka terakhir
   // Menu Utama
   repeat
+    clrscr;
     gotoxy(2, wherey);TextBackground(1);TextColor(15);
     writeln('                SEBUAH BANK.                 ');
     normVideo;
@@ -338,10 +340,9 @@ begin
     gotoxy(2, wherey);writeln('4. Meja 2 Memanggil');
     gotoxy(2, wherey);writeln('5. Keluar');
     writeln;
-    gotoxy(wherex + 1, 20);TextBackground(1);writeln('==============================================');
+    gotoxy(wherex + 1, wherey + 2);TextBackground(1);writeln('==============================================');
     normVideo;
-    gotoxy(wherex + 1, 17);write('Masukkan Pilihan (1-5) : ');readln(menu);
+    gotoxy(wherex + 1, wherey - 4);write('Masukkan Pilihan (1-5) : ');readln(menu);
     pilihanMenu(menu, q, last, meja1, meja2);
-    clrscr;
-  until menu = 5;
+  until menu = '5';
 end.
