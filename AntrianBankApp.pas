@@ -275,6 +275,11 @@ begin
     3 : menu3(qH, m1);
     4 : menu4(qH, m2);
     5 : menu5();
+  else
+    writeln;
+    gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Masukkan Salah!] Tekan tombol sembarang...   ');
+    NormVideo;
+    gotoxy(wherex - 3, wherey);readkey;
   end;
 end;
 
