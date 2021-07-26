@@ -263,6 +263,7 @@ procedure menu5();
 begin
   writeln;
   gotoxy(2, wherey);TextBackground(15);TextColor(0);write('Terimakasih Telah Menggunakan Aplikasi Ini... ');
+  NormVideo;
   gotoxy(wherex - 1, wherey);readkey;
 end;
 
@@ -345,4 +346,5 @@ begin
     gotoxy(wherex + 1, wherey - 4);write('Masukkan Pilihan (1-5) : ');readln(menu);
     pilihanMenu(menu, q, last, meja1, meja2);
   until menu = '5';
+  clrscr;
 end.
