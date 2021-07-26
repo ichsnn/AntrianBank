@@ -21,12 +21,6 @@ type
     size : integer;  // Banyak Antrian
   end;
 
-var
-  q : Antrian;  // antrian bank
-  last : integer; // nomor antrian angka terakhir
-  menu : integer; // pilihan menu
-  meja1, meja2 : nomorAntrian; // penampung nomor antrian yang dipanggil
-
 // inisialisasi antrian
 procedure init(var qH : Antrian);
 var
@@ -181,7 +175,7 @@ var
   temp : nomorAntrian;
 begin
   if isEmpty(qH) then
-    write('Antrian Kosong')
+    write('-')
   else
   begin
     temp := qH.nomor[1];
@@ -210,7 +204,7 @@ end;
 procedure displayMeja(m : nomorAntrian);
 begin
   if m.angka = 0 then
-    write('Kosong')
+    write('-')
   else
   begin
     if m.angka < 10 then
@@ -240,21 +234,36 @@ end;
 procedure menu3(var qH : Antrian; var m1 : nomorAntrian);
 begin
   if not isEmpty(qH) then
-    m1 := dequeue(qH);
+    m1 := dequeue(qH)
+  else
+  begin
+    writeln;
+    gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Antrian Kosong!] Tekan tombol sembarang...   ');
+    NormVideo;
+    gotoxy(wherex - 3, wherey);readkey;
+  end;
 end;
 
 // menu 4, panggil meja 2
 procedure menu4(var qH : Antrian; var m2 : nomorAntrian);
 begin
   if not isEmpty(qH) then
-    m2 := dequeue(qH);
+    m2 := dequeue(qH)
+  else
+  begin
+    writeln;
+    gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Antrian Kosong!] Tekan tombol sembarang...   ');
+    NormVideo;
+    gotoxy(wherex - 3, wherey);readkey;
+  end;
 end;
 
 // menu 5, keluar
 procedure menu5();
 begin
-  write('Terimakasih Sudah Menggunakan Aplikasi Ini...');
-  readkey;
+  writeln;
+  gotoxy(2, wherey);TextBackground(15);TextColor(0);write('Terimakasih Telah Menggunakan Aplikasi Ini... ');
+  gotoxy(wherex - 1, wherey);readkey;
 end;
 
 // menu, antrian, nomor antrian terakhir, nomor antrian di meja 1 dan 2
@@ -269,6 +278,12 @@ begin
   end;
 end;
 
+var
+  q : Antrian;  // antrian bank
+  last : integer; // nomor antrian angka terakhir
+  menu : integer; // pilihan menu
+  meja1, meja2 : nomorAntrian; // penampung nomor antrian yang dipanggi
+
 // PROGRAM UTAMA
 begin
   init(q); // inisialisasi antrian atau array
@@ -277,24 +292,51 @@ begin
   last := 0; // inisialisasi nomor urutan angka terakhir
   // Menu Utama
   repeat
-    writeln('-----------SISTEM ANTRIAN S.A.T. BANK-----------');
+    gotoxy(2, wherey);TextBackground(1);TextColor(15);
+    writeln('                SEBUAH BANK.                 ');
+    normVideo;
     writeln;
-    display(q);
+    gotoxy(2, wherey);writeln('.-------------------------------------------.');
+    gotoxy(2, wherey);write('|');
+    gotoxy(17, wherey);write('|');
+    gotoxy(32, wherey);write('|');
+    gotoxy(wherex, wherey);write('    Nomor     ');
+    gotoxy(46,wherey);writeln('|');
+    gotoxy(2, wherey);write('|');
+    gotoxy(17, wherey);write('|');
+    gotoxy(32, wherey);write('|');
+    gotoxy(7, wherey);write('Meja 1');
+    gotoxy(22, wherey);write('Meja 2');
+    gotoxy(34, wherey);write('Selanjutnya');
+    gotoxy(46, wherey);writeln('|');
+    gotoxy(2, wherey);write('|');
+    gotoxy(17, wherey);write('|');
+    gotoxy(32, wherey);write('|');
+    gotoxy(3, wherey);write('--------------');
+    gotoxy(18, wherey);write('--------------');
+    gotoxy(33, wherey);write('--------------');
+    gotoxy(46, wherey);writeln('|');
+    gotoxy(2, wherey);write('|');
+    gotoxy(8, wherey);displayMeja(meja1);
+    gotoxy(17, wherey);write('|');
+    gotoxy(23, wherey);displayMeja(meja2);
+    gotoxy(32, wherey);write('|');
+    gotoxy(37, wherey);peek(q);
+    gotoxy(46,wherey);writeln('|');
+    gotoxy(2, wherey);writeln('''-------------------------------------------''');
     writeln;
-    writeln('Meja 1        Menu 2        Nomor Selanjutnya');
-    gotoxy(wherex, wherey);displayMeja(meja1);
-    gotoxy(15, wherey);displayMeja(meja2);
-    gotoxy(29, wherey);peek(q);
+    gotoxy(2, wherey);writeln('MENU');
     writeln;
+    gotoxy(2, wherey);writeln('1. Tambah Antrian Bisnis');
+    gotoxy(2, wherey);writeln('2. Tambah Antrian Personal');
+    gotoxy(2, wherey);writeln('3. Meja 1 Memanggil');
+    gotoxy(2, wherey);writeln('4. Meja 2 Memanggil');
+    gotoxy(2, wherey);writeln('5. Keluar');
     writeln;
-    writeln('1. Tambah Antrian Bisnis');
-    writeln('2. Tambah Antrian Personal');
-    writeln('3. Meja 1 Memanggil');
-    writeln('4. Meja 2 Memanggil');
-    writeln('5. Keluar');
-    writeln;
-    write('Masukkan Pilihan (1-5) : ');readln(menu);
-    clrscr;
+    gotoxy(wherex + 1, 20);TextBackground(1);writeln('==============================================');
+    normVideo;
+    gotoxy(wherex + 1, 17);write('Masukkan Pilihan (1-5) : ');readln(menu);
     pilihanMenu(menu, q, last, meja1, meja2);
+    clrscr;
   until menu = 5;
 end.
