@@ -5,7 +5,7 @@
 // Program Ini Menggunakan Array Sebagai Heap
 
 program AntrianBankApp;
-uses crt;
+uses crt, MMsystem, sysUtils;
 
 const
   MAX = 100;  // Maksimum Antrian
@@ -216,6 +216,65 @@ begin
   end;
 end;
 
+// putar suara
+procedure playSound(suara : string);
+var
+  Pnamafile : PChar;
+  namafile : string;
+begin
+  namafile := 'assets\sounds\' + suara + '.wav';
+  Pnamafile := StrAlloc(length(namafile));
+  Pnamafile := StrPCopy(Pnamafile, namafile);
+  sndPlaySound(Pnamafile, snd_sync);
+end;
+
+// suara jenis
+procedure soundJenis(jenis : char);
+begin
+  playSound(jenis);
+end;
+
+// angka satuan
+procedure soundSatuan(satuan : int64);
+begin
+  playSound(IntToStr(satuan));
+end;
+
+// suara angka
+procedure soundAngka(angka : int64);
+begin
+  if angka > 0 then
+  begin
+    if angka < 10 then
+    begin
+      soundSatuan(0);
+      soundSatuan(0);
+      soundSatuan(angka);
+    end
+    else if angka < 100 then
+    begin
+      soundSatuan(0);
+      soundSatuan(angka div 10);
+      soundSatuan(angka mod 10);
+    end
+    else if angka < 1000 then
+    begin
+      soundSatuan(angka div 100);
+      soundSatuan((angka mod 100) div 10);
+      soundSatuan((angka mod 100) mod 10);
+    end;
+  end;
+end;
+
+// suara ketika dilakukan pemanggilan
+procedure soundPanggilan(jenis : char; angka : int64);
+begin
+  playSound('panggilan');
+  soundJenis(jenis);
+  soundAngka(angka);
+  playSound('meja');
+end;
+
 // menu 1, tambah antrian bisnis
 procedure menu1(var qH : Antrian; var cur : integer);
 begin
@@ -234,7 +293,11 @@ end;
 procedure menu3(var qH : Antrian; var m1 : nomorAntrian);
 begin
   if not isEmpty(qH) then
-    m1 := dequeue(qH)
+  begin
+    m1 := dequeue(qH);
+    soundPanggilan(m1.huruf, m1.angka);
+    playSound('1');
+  end
   else
   begin
     writeln;
@@ -248,7 +311,11 @@ end;
 procedure menu4(var qH : Antrian; var m2 : nomorAntrian);
 begin
   if not isEmpty(qH) then
-    m2 := dequeue(qH)
+  begin
+    m2 := dequeue(qH);
+    soundPanggilan(m2.huruf, m2.angka);
+    playSound('2');
+  end
   else
   begin
     writeln;
