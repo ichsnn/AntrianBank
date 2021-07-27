@@ -12,8 +12,8 @@ const
 
 type
   NomorAntrian = record
-    huruf : char;     // Bisnis(B), Personal(P)
-    angka : integer; 
+    huruf : char;     // Jenis antrian : Bisnis(B); Personal(P)
+    angka : integer;
   end;
 
   Antrian = record
@@ -66,25 +66,33 @@ begin
   min := N;   // indeks root
   L := N * 2;
   R := N * 2 + 1;
-  // jika anak kiri lebih besar dari root
+
+  // jika jenis antrian root dan anak kiri sama
   if qH.nomor[min].huruf = qH.nomor[L].huruf then
   begin
+    // jika angka root lebih besar dari anak kiri
     if (L < size(qH)) and (qH.nomor[min].angka > qH.nomor[L].angka) then
       min := L;
   end
+  // jika jenis antrian root dan anak kiri tidak sama
   else
   begin
+    // jika huruf root (jenis) adalah P atau bukan prioritas
     if (L < size(qH)) and (qH.nomor[min].huruf = 'P') then
       min := L;
   end;
-  // jika anak kanan lebih besar dari root
+
+  // jika jenis antrian root dan anak kanan sama
   if qH.nomor[min].huruf = qH.nomor[R].huruf then
   begin
+    // jika angka root lebih besar dari anak kanan
     if (R < size(qH)) and (qH.nomor[min].angka > qH.nomor[R].angka) then
       min := R;
   end
+  // jika jenis antrian root dan anak kiri tidak sama
   else
   begin
+    // jika huruf root (jenis) adalah P atau bukan prioritas
     if (R < size(qH)) and (qH.nomor[min].huruf = 'P') then
       min := R;
   end;
@@ -94,7 +102,7 @@ begin
   begin
     // tukar nilai indeks
     swap(qH, N, min);
-    // rekrusif
+    // rekrusif shiftdown (prosedur yang sama)
     shiftDown(qH, min);
   end;
 end;
@@ -107,6 +115,8 @@ var
 begin
   p := posisi div 2;
   c := posisi;
+
+  // jika huruf atau jenis sama
   if(qH.nomor[p].huruf = qH.nomor[c].huruf) then
     while (c > 0) and (qH.nomor[p].angka > qH.nomor[c].angka) do
     begin
@@ -114,6 +124,7 @@ begin
       c := p;
       p := p div 2;
     end
+  // jika huruf atau jenis tidak sama
   else
     while (c > 0) and (qH.nomor[p].huruf = 'P') do
     begin
@@ -128,19 +139,19 @@ procedure insert(var qH : Antrian; h : char; a : integer);
 var
   i : integer;  // indeks
 begin
-  if qH.size = MAX then
-    writeln('[Antrian Penuh]')
-  else
-  begin
-    qH.size := qH.size + 1;
-    i := qH.size;
-    qH.nomor[i].huruf := h;
-    qH.nomor[i].angka := a;
-    shiftUp(qH, i);
-  end;
+  qH.size := qH.size + 1; // tambah size antrian
+
+  // insert data di indeks paling bawah atau terakhir
+  i := qH.size;
+  qH.nomor[i].huruf := h;
+  qH.nomor[i].angka := a;
+
+  // lakukan shift up jika melanggar aturan heap
+  shiftUp(qH, i);
 end;
 
-// tampilkan antrian
+// tampilkan antrian (digunakan untuk cek isi keseluruhan antrian)
+{
 procedure display(qH : Antrian);
 var
   i : integer;
@@ -153,9 +164,9 @@ begin
       write(' ' , qH.nomor[i].huruf , qH.nomor[i].angka);
   writeln;
 end;
+}
 
-
-// dequeue
+// dequeue atau extract-min
 function dequeue(var qH : Antrian) : NomorAntrian;
 var
   front : NomorAntrian;
@@ -174,10 +185,12 @@ procedure peek(qH : Antrian);
 var
   temp : nomorAntrian;
 begin
+  // jika antrian kosong
   if (isEmpty(qH)) then
   begin
-    gotoxy(wherex - 1, wherey);write('Kosong');
+    gotoxy(wherex, wherey);write('Kosong');
   end
+  // jika tidak
   else
   begin
     temp := qH.nomor[1];
@@ -211,10 +224,13 @@ begin
   end
   else
   begin
+    // jika nomor antrian kurang dari 10 maka tampilan $huruf00$angka
     if m.angka < 10 then
       write(m.huruf,'00',m.angka)
+    // jika nomor antrian kurang dari 100 maka tampilan $huruf0$angka
     else if m.angka < 100 then
       write(m.huruf,'0',m.angka)
+    // jika nomor antrian kurang dari 100 maka tampilan $huruf$angka
     else
       write(m.huruf,m.angka);
   end;
@@ -226,46 +242,40 @@ var
   Pnamafile : PChar;
   namafile : string;
 begin
-  namafile := 'assets\sounds\' + suara + '.wav';
-  Pnamafile := StrAlloc(length(namafile));
-  Pnamafile := StrPCopy(Pnamafile, namafile);
-  sndPlaySound(Pnamafile, snd_sync);
-end;
-
-// suara jenis
-procedure soundJenis(jenis : char);
-begin
-  playSound(jenis);
-end;
-
-// angka satuan
-procedure soundSatuan(satuan : int64);
-begin
-  playSound(IntToStr(satuan));
+  namafile := 'assets\sounds\' + suara + '.wav'; {directory file yang dipanggil}
+  Pnamafile := StrAlloc(length(namafile));       {siapkan memori yang akan dipakai untuk menampung Pnamafile}
+  Pnamafile := StrPCopy(Pnamafile, namafile);    {salin namafile ke Pnamafile}
+  sndPlaySound(Pnamafile, snd_sync);             {putar suara sesuai nama file}
 end;
 
 // suara angka
 procedure soundAngka(angka : int64);
 begin
+  // angka harus lebih dari 0
+  // karena angka merupakan integer, maka lakukan konversi ke string menggunakan IntToStr() dengan unit sysUtils
+  // untuk dikonversi menjadi string angka harus bertipe data setidaknya int64
   if angka > 0 then
   begin
+    // jika angka kurang dari 10 suara "nol" "nol" "angka"
     if angka < 10 then
     begin
-      soundSatuan(0);
-      soundSatuan(0);
-      soundSatuan(angka);
+      playSound(IntToStr(0));
+      playSound(IntToStr(0));
+      playSound(IntToStr(angka));
     end
+    // jika angka kurang dari 100 suara "nol" "satuan angka" "satuan sisa angka"
     else if angka < 100 then
     begin
-      soundSatuan(0);
-      soundSatuan(angka div 10);
-      soundSatuan(angka mod 10);
+      playSound(IntToStr(0));
+      playSound(IntToStr(angka div 10));
+      playSound(IntToStr(angka mod 10));
     end
+    // jika angka kurang dari 1000 suara "satuan angka" "sisa satuan (satuan angka)" "sisa sisa (satuan angka)"
     else if angka < 1000 then
     begin
-      soundSatuan(angka div 100);
-      soundSatuan((angka mod 100) div 10);
-      soundSatuan((angka mod 100) mod 10);
+      playSound(IntToStr(angka div 100));
+      playSound(IntToStr((angka mod 100) div 10));
+      playSound(IntToStr((angka mod 100) mod 10));
     end;
   end;
 end;
@@ -274,7 +284,7 @@ end;
 procedure soundPanggilan(jenis : char; angka : int64);
 begin
   playSound('panggilan');
-  soundJenis(jenis);
+  playSound(jenis);
   soundAngka(angka);
   playSound('meja');
 end;
@@ -296,36 +306,52 @@ end;
 // menu 3, panggil meja 1
 procedure menu3(var qH : Antrian; var m1 : nomorAntrian);
 begin
+  // jika antrian tidak kosong lakukan pemanggilan (dequeue)
   if not isEmpty(qH) then
   begin
     m1 := dequeue(qH);
+    // panggil prosedure suara ketika pemanggilan
     soundPanggilan(m1.huruf, m1.angka);
+    // suara nomor meja
     playSound('1');
   end
+  //jika antrian kosong tampilkan warning antrian kosong
   else
   begin
     writeln;
-    gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Antrian Kosong!] Tekan tombol sembarang...   ');
+    gotoxy(2, wherey);
+    TextBackground(4);
+    TextColor(15);
+    write('[Antrian Kosong!] Tekan tombol sembarang...   ');
     NormVideo;
-    gotoxy(wherex - 3, wherey);readkey;
+    gotoxy(wherex - 3, wherey);
+    readkey;
   end;
 end;
 
 // menu 4, panggil meja 2
 procedure menu4(var qH : Antrian; var m2 : nomorAntrian);
 begin
+  //jika antrian tidak kosong lakukan pemanggilan (dequeue)
   if not isEmpty(qH) then
   begin
     m2 := dequeue(qH);
+    // panggil prosedure suara ketika pemanggilan
     soundPanggilan(m2.huruf, m2.angka);
+    // suara nomor meja
     playSound('2');
   end
+  //jika antrian kosong tampilkan warning antrian kosong
   else
   begin
     writeln;
-    gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Antrian Kosong!] Tekan tombol sembarang...   ');
+    gotoxy(2, wherey);
+    TextBackground(4);
+    TextColor(15);
+    write('[Antrian Kosong!] Tekan tombol sembarang...   ');
     NormVideo;
-    gotoxy(wherex - 3, wherey);readkey;
+    gotoxy(wherex - 3, wherey);
+    readkey;
   end;
 end;
 
@@ -333,9 +359,13 @@ end;
 procedure menu5();
 begin
   writeln;
-  gotoxy(2, wherey);TextBackground(15);TextColor(0);write('Terimakasih Telah Menggunakan Aplikasi Ini... ');
+  gotoxy(2, wherey);
+  TextBackground(15);
+  TextColor(0);
+  write('Terimakasih Telah Menggunakan Aplikasi Ini... ');
   NormVideo;
-  gotoxy(wherex - 1, wherey);readkey;
+  gotoxy(wherex - 1, wherey);
+  readkey;
 end;
 
 // menu, antrian, nomor antrian terakhir, nomor antrian di meja 1 dan 2
@@ -348,73 +378,97 @@ begin
     '4' : menu4(qH, m2);
     '5' : menu5();
   else
+    // jika inputan menu tidak sesuai
     writeln;
-    gotoxy(2, wherey);TextBackground(4);TextColor(15);write('[Masukkan Salah!] Tekan tombol sembarang...   ');
+    gotoxy(2, wherey);
+    TextBackground(4);
+    TextColor(15);
+    write('[Masukkan Salah!] Tekan tombol sembarang...   ');
     NormVideo;
-    gotoxy(wherex - 3, wherey);readkey;
+    gotoxy(wherex - 3, wherey);
+    readkey;
   end;
 end;
 
 // Deklarasi Variabel Yang Akan Digunakan
 var
-  q : Antrian;  // antrian bank
-  last : integer; // nomor antrian angka terakhir
-  menu : char; // pilihan menu
-  meja1, meja2 : nomorAntrian; // penampung nomor antrian yang dipanggi
+  q : Antrian;  {antrian bank}
+  last : integer; {nomor antrian angka terakhir}
+  menu : char; {pilihan menu}
+  meja1, meja2 : nomorAntrian; {penampung nomor antrian yang dipanggi}
 
 // PROGRAM UTAMA
 begin
-  init(q); // inisialisasi antrian atau array
-  meja1 := q.nomor[1]; // inisialisasi nomor antrian meja 1
-  meja2 := q.nomor[1]; // inisialisasi nomor antrian meja 2
-  last := 0; // inisialisasi nomor urutan angka terakhir
+  init(q); {inisialisasi antrian atau array}
+  meja1.huruf := ' '; {inisialisasi nomor antrian meja 1}
+  meja1.angka := 0;
+  meja2.huruf := ' '; {inisialisasi nomor antrian meja 2}
+  meja2.angka := 0;
+  last := 0; {inisialisasi nomor urutan angka terakhir}
+
   // Menu Utama
   repeat
     clrscr;
-    gotoxy(2, wherey);TextBackground(1);TextColor(15);
-    writeln('                SEBUAH BANK.                 ');
+    //Tampilan Layar Program
+    gotoxy(2, wherey);
+    TextBackground(1);
+    TextColor(15);
+    writeln('                 SEBUAH BANK.                 ');
     normVideo;
     writeln;
-    gotoxy(2, wherey);writeln('.-------------------------------------------.');
-    gotoxy(2, wherey);write('|');
-    gotoxy(17, wherey);write('|');
-    gotoxy(32, wherey);write('|');
-    gotoxy(wherex, wherey);write('    Nomor     ');
-    gotoxy(46,wherey);writeln('|');
-    gotoxy(2, wherey);write('|');
-    gotoxy(17, wherey);write('|');
-    gotoxy(32, wherey);write('|');
-    gotoxy(7, wherey);write('Meja 1');
-    gotoxy(22, wherey);write('Meja 2');
-    gotoxy(34, wherey);write('Selanjutnya');
-    gotoxy(46, wherey);writeln('|');
-    gotoxy(2, wherey);write('|');
-    gotoxy(17, wherey);write('|');
-    gotoxy(32, wherey);write('|');
-    gotoxy(3, wherey);write('--------------');
-    gotoxy(18, wherey);write('--------------');
-    gotoxy(33, wherey);write('--------------');
-    gotoxy(46, wherey);writeln('|');
-    gotoxy(2, wherey);write('|');
-    gotoxy(8, wherey);displayMeja(meja1);
-    gotoxy(17, wherey);write('|');
-    gotoxy(23, wherey);displayMeja(meja2);
-    gotoxy(32, wherey);write('|');
-    gotoxy(37, wherey);peek(q);
-    gotoxy(46,wherey);writeln('|');
-    gotoxy(2, wherey);writeln('''-------------------------------------------''');
+    gotoxy(2, wherey);
+    writeln('.--------------------------------------------.');
+    gotoxy(2, wherey);
+    writeln('|              |              |    Nomor     |');
+    gotoxy(2, wherey);
+    writeln('|    Meja 1    |    Meja 2    | Selanjutnya  |');
+    gotoxy(2, wherey);
+    writeln('|--------------|--------------|--------------|');
+    gotoxy(2, wherey);
+    write('|');
+    gotoxy(8, wherey);
+    displayMeja(meja1); {tampilkan nomor antrian di meja 1}
+    gotoxy(17, wherey);
+    write('|');
+    gotoxy(23, wherey);
+    displayMeja(meja2); {tampilkan nomor antrian di meja 2}
+    gotoxy(32, wherey);
+    write('|');
+    gotoxy(37, wherey);
+    peek(q);            {tampilkan nomor antrian selanjutnya}
+    gotoxy(47,wherey);
+    writeln('|');
+    gotoxy(2, wherey);
+    writeln('''--------------------------------------------''');
     writeln;
-    gotoxy(2, wherey);writeln('MENU');
-    writeln;
-    gotoxy(2, wherey);writeln('1. Tambah Antrian Bisnis');
-    gotoxy(2, wherey);writeln('2. Tambah Antrian Personal');
-    gotoxy(2, wherey);writeln('3. Meja 1 Memanggil');
-    gotoxy(2, wherey);writeln('4. Meja 2 Memanggil');
-    gotoxy(2, wherey);writeln('5. Keluar');
-    writeln;
-    gotoxy(wherex + 1, wherey + 2);TextBackground(1);writeln('==============================================');
+    gotoxy(2, wherey);
+
+    {Pilihan Menu Program}
+    gotoxy(2, wherey);
+    writeln('-------------------- MENU --------------------');
     normVideo;
-    gotoxy(wherex + 1, wherey - 4);write('Masukkan Pilihan (1-5) : ');readln(menu);
+    writeln;
+    gotoxy(2, wherey);
+    writeln('1. Tambah Antrian Bisnis');
+    gotoxy(2, wherey);
+    writeln('2. Tambah Antrian Personal');
+    gotoxy(2, wherey);
+    writeln('3. Meja 1 Memanggil');
+    gotoxy(2, wherey);
+    writeln('4. Meja 2 Memanggil');
+    gotoxy(2, wherey);
+    writeln('5. Keluar');
+    writeln;
+    gotoxy(wherex + 1, wherey + 2);
+    TextBackground(1);
+    writeln('==============================================');
+    normVideo;
+    gotoxy(wherex + 1, wherey - 4);
+
+    // inputan atau masukan pilihan menu
+    write('Masukkan Pilihan (1-5) : ');readln(menu);
+
+    // panggil prosedure pilihan menu
     pilihanMenu(menu, q, last, meja1, meja2);
   until menu = '5';
   clrscr;
