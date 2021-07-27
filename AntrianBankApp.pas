@@ -8,7 +8,7 @@ program AntrianBankApp;
 uses crt, MMsystem, sysUtils;
 
 const
-  MAX = 100;  // Maksimum Antrian
+  MAX = 999;  // Maksimum Antrian
 
 type
   NomorAntrian = record
@@ -17,7 +17,7 @@ type
   end;
 
   Antrian = record
-    nomor : array[1..100] of NomorAntrian;
+    nomor : array[1..MAX] of NomorAntrian;
     size : integer;  // Banyak Antrian
   end;
 
@@ -174,8 +174,10 @@ procedure peek(qH : Antrian);
 var
   temp : nomorAntrian;
 begin
-  if isEmpty(qH) then
-    write('-')
+  if (isEmpty(qH)) then
+  begin
+    gotoxy(wherex - 1, wherey);write('Kosong');
+  end
   else
   begin
     temp := qH.nomor[1];
@@ -204,7 +206,9 @@ end;
 procedure displayMeja(m : nomorAntrian);
 begin
   if m.angka = 0 then
-    write('-')
+  begin
+    gotoxy(wherex - 1, wherey);write('Kosong');
+  end
   else
   begin
     if m.angka < 10 then
